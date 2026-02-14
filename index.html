@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klassevenn — Lesetrening for barn</title>
+  <meta name="description" content="Klassevenn gjør lesetrening enklere og morsommere! For elever på barneskolen — også for de som har dysleksi eller andre lesevansker.">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="speech-bubble fade-in">
+        <p>Klassevenn gjør lesetrening enklere og morsommere!</p>
+      </div>
+      <img src="assets/owl.png" alt="Klassevenn-ugla" class="hero-owl fade-in">
+      <p class="hero-subtitle fade-in">
+        For elever på barneskolen — også for de som har dysleksi eller andre lesevansker.
+      </p>
+      <a href="#slik-fungerer-det" class="cta-button fade-in">Kom i gang</a>
+    </div>
+  </section>
+
+  <!-- Slik fungerer det -->
+  <section class="how-it-works" id="slik-fungerer-det">
+    <div class="container">
+      <h2 class="section-title fade-in">Slik fungerer det</h2>
+      <div class="steps">
+        <div class="step-card fade-in">
+          <img src="assets/camera.png" alt="Kamera" class="step-icon">
+          <h3>Ta bilde av teksten</h3>
+          <p>Eleven tar bilde av leksen med mobilen.</p>
+        </div>
+        <div class="step-card fade-in">
+          <img src="assets/microphone.png" alt="Mikrofon" class="step-icon">
+          <h3>Lytt og lær</h3>
+          <p>Klassevenn leser høyt med engasjerende stemmer og oppsummerer innholdet.</p>
+        </div>
+        <div class="step-card fade-in">
+          <img src="assets/files.png" alt="Oppgaver" class="step-icon">
+          <h3>Øv med oppgaver</h3>
+          <p>Appen lager leseøvelser og spørsmål tilpasset teksten.</p>
+        </div>
+        <div class="step-card fade-in">
+          <img src="assets/finish.png" alt="Tilbakemelding" class="step-icon">
+          <h3>Se hvordan det gikk</h3>
+          <p>Eleven og foresatte får tilbakemelding etterpå.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature highlights -->
+  <section class="features" id="funksjoner">
+    <div class="container">
+      <div class="feature-grid">
+        <div class="feature-block fade-in">
+          <img src="assets/owl-about-to-read.png" alt="Ugla leser" class="feature-image">
+          <div class="feature-text">
+            <h3>Lesetrening med støtte</h3>
+            <p>Klassevenn hjelper eleven med å lese tekster høyt, med tilpasset tempo og støtte. Spesielt utviklet for barn med dysleksi eller andre lesevansker — men passer for alle.</p>
+          </div>
+        </div>
+        <div class="feature-block fade-in">
+          <img src="assets/owl-processing.png" alt="Ugla tenker" class="feature-image">
+          <div class="feature-text">
+            <h3>Smarte oppgaver, tilpasset barnet</h3>
+            <p>Kunstig intelligens lager øvelser og spørsmål basert på akkurat den teksten barnet jobber med. Hver økt er unik og tilpasset nivået.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo / Preview -->
+  <section class="demo" id="demo">
+    <div class="container">
+      <div class="demo-content fade-in">
+        <div class="phone-mockup">
+          <img src="assets/leselekse.jpg" alt="Eksempel på leselekse" class="phone-screen">
+        </div>
+        <div class="demo-text">
+          <h2>Eleven tar bilde — Klassevenn tar seg av resten</h2>
+          <p>Bare ta et bilde av lekseteksten, så lager Klassevenn en engasjerende lesesekvens med opplesning, øvelser og tilbakemelding.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-tagline">Enkelt for barnet. Trygt for deg.</p>
+      <a href="personvern.html" class="footer-link">Personvern</a>
+      <div class="footer-brand">
+        <img src="assets/klassevenn-icon.png" alt="Klassevenn" class="footer-icon">
+        <span>&copy; 2025 Klassevenn</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Fade-in on scroll using IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
