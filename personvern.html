@@ -27,7 +27,7 @@
   <main class="policy-page">
     <div class="container">
       <h1>Personvernerklæring</h1>
-      <p class="policy-updated">Sist oppdatert: 14. februar 2026</p>
+      <p class="policy-updated">Sist oppdatert: 19. februar 2026</p>
 
       <h2>1. Behandlingsansvarlig</h2>
       <p>Klassevenn er behandlingsansvarlig for personopplysninger som samles inn gjennom appen Klassevenn. Vi er opptatt av å beskytte personvernet til brukerne våre, spesielt barn.</p>
@@ -49,15 +49,19 @@
         <li><strong>Forbedring av tjenesten:</strong> Å forstå bruksmønstre for å gjøre appen bedre. Rettslig grunnlag: berettiget interesse (GDPR art. 6(1)(f)).</li>
       </ul>
 
-      <h2>4. Kunstig intelligens og bildeprosessering</h2>
-      <p>Klassevenn bruker kunstig intelligens (AI) til å:</p>
+      <h2>4. Kunstig intelligens (Google Gemini)</h2>
+      <p>Klassevenn bruker Googles Gemini AI-plattform til å drive læringsopplevelsen. Følgende modeller er i bruk:</p>
       <ul>
-        <li>Lese og tolke tekst fra bilder tatt av eleven (OCR/bildegjenkjenning).</li>
-        <li>Generere tilpassede lese- og lytteøvelser basert på tekstinnholdet.</li>
-        <li>Lage spørsmål og oppgaver for å teste forståelse.</li>
-        <li>Gi tilbakemelding på elevens lesing.</li>
+        <li><strong>Gemini 3 Pro</strong> (via Gemini API): Leser og tolker tekst fra bilder, genererer leseøvelser, lytteøvelser, quiz og tilbakemeldinger, og vurderer elevens leseferdigheter.</li>
+        <li><strong>Gemini 2.5 Pro TTS</strong> (via Vertex AI): Genererer naturlig tale for opplesing av tekst og oppgaver.</li>
       </ul>
-      <p>Bilder og tekst som sendes til AI-modellen brukes kun for å levere tjenesten i den aktuelle økten. Dataene brukes ikke til å trene AI-modeller.</p>
+      <p>Følgende data sendes til Google for prosessering:</p>
+      <ul>
+        <li><strong>Bilder:</strong> Bilder av lekser og tekst tatt av eleven sendes for tekstgjenkjenning (OCR) og innholdsanalyse.</li>
+        <li><strong>Tekst:</strong> Uttrukket tekst sendes for å generere tilpassede lese- og lytteøvelser, spørsmål og tilbakemeldinger.</li>
+        <li><strong>Lydopptak:</strong> Når lydopptak er aktivert for en profil, sendes opptak av elevens lesing for vurdering av leseferdigheter.</li>
+      </ul>
+      <p>Data som sendes til Google brukes kun for å levere tjenesten i den aktuelle økten. Dataene brukes ikke til å trene AI-modeller. Googles behandling av data er regulert av deres <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">personvernerklæring</a>.</p>
 
       <h2>5. Barns personvern</h2>
       <p>Klassevenn er utviklet for barn på barneskolen, og vi tar barns personvern svært alvorlig.</p>
@@ -79,7 +83,7 @@
       <h2>7. Deling med tredjeparter</h2>
       <p>Vi deler personopplysninger med følgende tredjeparter, kun i den grad det er nødvendig for å levere tjenesten:</p>
       <ul>
-        <li><strong>AI-tjenesteleverandør:</strong> Bilder og tekst sendes til vår AI-leverandør for prosessering. Disse dataene behandles i henhold til deres personvernerklæring og vår databehandleravtale.</li>
+        <li><strong>Google (Gemini API og Vertex AI):</strong> Bilder, tekst og lydopptak sendes til Googles Gemini-tjenester for prosessering som beskrevet i seksjon 4. Behandlingen er regulert av Googles <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">personvernerklæring</a> og vår databehandleravtale.</li>
       </ul>
       <p>Vi selger ikke personopplysninger til tredjeparter, og vi deler ikke data for markedsføringsformål.</p>
 
