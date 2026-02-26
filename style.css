@@ -183,6 +183,18 @@ img {
   background: #FEF9F0;
 }
 
+.feature-section:nth-of-type(odd) {
+  background:
+    radial-gradient(ellipse 70% 60% at 70% 50%, var(--color-accent-soft) 0%, transparent 70%),
+    #FEF9F0;
+}
+
+.feature-section:nth-of-type(even) {
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 50%, var(--color-accent-soft) 0%, transparent 70%),
+    #FEF9F0;
+}
+
 .feature-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
