@@ -280,6 +280,67 @@ img {
   text-align: justify;
 }
 
+/* ===== Audio Player ===== */
+.audio-player-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  display: block;
+  margin-top: 20px;
+}
+
+.audio-player {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 28px;
+  padding: 8px 16px 8px 8px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.audio-player-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-btn);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(58, 125, 74, 0.25);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.audio-player-btn:hover {
+  background: var(--color-btn-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 106, 61, 0.35);
+}
+
+.audio-player-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.audio-waveform {
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.audio-time {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
 /* ===== Contact ===== */
 .contact {
   padding: 100px 0 80px;
@@ -538,6 +599,20 @@ img {
 
   .phone-frame-lg img {
     width: 90vw;
+  }
+
+  .audio-player {
+    max-width: 300px;
+  }
+
+  .audio-player-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .audio-player-icon {
+    width: 16px;
+    height: 16px;
   }
 
   .contact {

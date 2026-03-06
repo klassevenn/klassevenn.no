@@ -87,6 +87,20 @@
         <div class="feature-copy fade-in">
           <h2>Lytt og lær</h2>
           <p>Klassevenn leser teksten høyt med engasjerende stemmer i rolig tempo, og oppsummerer innholdet slik at du lettere forstår det du skal jobbe med.</p>
+          <!-- Audio player -->
+          <span class="audio-player-label">Hør et eksempel</span>
+          <div class="audio-player fade-in" id="audio-player">
+            <button class="audio-player-btn" id="audio-play-btn" aria-label="Spill av">
+              <svg class="audio-player-icon" id="audio-icon-play" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <svg class="audio-player-icon" id="audio-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+                <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+              </svg>
+            </button>
+            <div class="audio-waveform" id="audio-waveform"></div>
+            <span class="audio-time" id="audio-time">0:00</span>
+          </div>
         </div>
       </div>
     </div>
@@ -180,6 +194,128 @@
     });
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Audio player
+    (function() {
+      var audio = new Audio('assets/audio_example.mp3');
+      var playBtn = document.getElementById('audio-play-btn');
+      var iconPlay = document.getElementById('audio-icon-play');
+      var iconPause = document.getElementById('audio-icon-pause');
+      var waveformEl = document.getElementById('audio-waveform');
+      var timeEl = document.getElementById('audio-time');
+      var bars = [];
+      var barCount = 60;
+
+      // Extract waveform data from the audio file
+      fetch('assets/audio_example.mp3')
+        .then(function(r) { return r.arrayBuffer(); })
+        .then(function(buf) {
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          return ctx.decodeAudioData(buf).then(function(decoded) {
+            ctx.close();
+            return decoded;
+          });
+        })
+        .then(function(decoded) {
+          var data = decoded.getChannelData(0);
+          var segLen = Math.floor(data.length / barCount);
+          var amps = [];
+          for (var i = 0; i < barCount; i++) {
+            var sum = 0;
+            var start = i * segLen;
+            for (var j = start; j < start + segLen; j++) {
+              sum += data[j] * data[j];
+            }
+            amps.push(Math.sqrt(sum / segLen));
+          }
+          var max = Math.max.apply(null, amps);
+          if (max === 0) max = 1;
+          var normalized = amps.map(function(a) { return a / max; });
+          renderWaveform(normalized);
+        })
+        .catch(function() {
+          // Fallback: random bars if decoding fails
+          var fallback = [];
+          for (var i = 0; i < barCount; i++) fallback.push(0.2 + Math.random() * 0.8);
+          renderWaveform(fallback);
+        });
+
+      function renderWaveform(amplitudes) {
+        var barW = 3;
+        var gap = 2;
+        var svgW = amplitudes.length * (barW + gap) - gap;
+        var svgH = 32;
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 ' + svgW + ' ' + svgH);
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', svgH);
+        svg.style.display = 'block';
+        bars = [];
+        for (var i = 0; i < amplitudes.length; i++) {
+          var h = Math.max(3, amplitudes[i] * svgH);
+          var rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', i * (barW + gap));
+          rect.setAttribute('y', (svgH - h) / 2);
+          rect.setAttribute('width', barW);
+          rect.setAttribute('height', h);
+          rect.setAttribute('rx', 1.5);
+          rect.setAttribute('fill', 'rgba(0,0,0,0.2)');
+          svg.appendChild(rect);
+          bars.push(rect);
+        }
+        waveformEl.innerHTML = '';
+        waveformEl.appendChild(svg);
+      }
+
+      function updateBars(fraction) {
+        var played = Math.floor(fraction * bars.length);
+        for (var i = 0; i < bars.length; i++) {
+          bars[i].setAttribute('fill', i < played ? 'var(--color-btn)' : 'rgba(0,0,0,0.2)');
+        }
+      }
+
+      function formatTime(s) {
+        var m = Math.floor(s / 60);
+        var sec = Math.floor(s % 60);
+        return m + ':' + (sec < 10 ? '0' : '') + sec;
+      }
+
+      playBtn.addEventListener('click', function() {
+        if (audio.paused) {
+          audio.play();
+          iconPlay.style.display = 'none';
+          iconPause.style.display = 'block';
+        } else {
+          audio.pause();
+          iconPlay.style.display = 'block';
+          iconPause.style.display = 'none';
+        }
+      });
+
+      audio.addEventListener('timeupdate', function() {
+        if (audio.duration) {
+          updateBars(audio.currentTime / audio.duration);
+          timeEl.textContent = formatTime(audio.currentTime);
+        }
+      });
+
+      audio.addEventListener('ended', function() {
+        iconPlay.style.display = 'block';
+        iconPause.style.display = 'none';
+        updateBars(0);
+        timeEl.textContent = '0:00';
+        audio.currentTime = 0;
+      });
+
+      waveformEl.addEventListener('click', function(e) {
+        var rect = waveformEl.getBoundingClientRect();
+        var frac = (e.clientX - rect.left) / rect.width;
+        if (audio.duration) {
+          audio.currentTime = frac * audio.duration;
+          updateBars(frac);
+        }
+      });
+    })();
 
     // Contact email (assembled at runtime to deter scraping)
     (function(){
