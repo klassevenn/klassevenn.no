@@ -462,6 +462,16 @@ img {
 }
 
 /* ===== Responsive ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero-owl-logo {
+    display: none;
+  }
+
+  .hero-logo {
+    align-self: center;
+  }
+}
+
 @media (max-width: 768px) {
   .hero-grid {
     grid-template-columns: 1fr;
