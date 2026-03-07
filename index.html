@@ -90,16 +90,16 @@
           <!-- Audio player -->
           <span class="audio-player-label">Hør et eksempel</span>
           <div class="audio-player fade-in" id="audio-player">
-            <button class="audio-player-btn" id="audio-play-btn" aria-label="Spill av">
-              <svg class="audio-player-icon" id="audio-icon-play" viewBox="0 0 24 24" fill="currentColor">
+            <button class="audio-player-btn" aria-label="Spill av">
+              <svg class="audio-player-icon play-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z"/>
               </svg>
-              <svg class="audio-player-icon" id="audio-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+              <svg class="audio-player-icon pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none">
                 <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
               </svg>
             </button>
-            <div class="audio-waveform" id="audio-waveform"></div>
-            <span class="audio-time" id="audio-time">0:00</span>
+            <div class="audio-waveform"></div>
+            <span class="audio-time">0:00</span>
           </div>
         </div>
       </div>
@@ -139,6 +139,42 @@
         <div class="feature-copy fade-in">
           <h2>Detaljert tilbakemelding</h2>
           <p>Etter hver leseøkt vil kunstig intelligens analysere lydopptaket (dersom tillatelse er gitt) og svarene fra quizen. Foresatte kan deretter motta en detaljert vurdering på epost, med konkrete tips til videre trening.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- Feature 5: Lekseassistent -->
+  <section class="feature-section">
+    <div class="container">
+      <div class="feature-row">
+        <div class="feature-phone fade-in">
+          <div class="assignment-composition">
+            <img src="assets/assignments.png" alt="Oppgaveark" class="assignment-page">
+            <div class="phone-frame assignment-phone">
+              <img src="assets/klassevenn-assignments.png" alt="Klassevenn lekseassistent">
+            </div>
+          </div>
+        </div>
+        <div class="feature-copy fade-in">
+          <h2>Lærerassistent</h2>
+          <p>Ta bilde av oppgavene og få trinn-for-trinn veiledning. Klassevenn hjelper deg gjennom hver deloppgave med forklaringer og hint.</p>
+          <!-- Audio player (reuses .audio-player styles) -->
+          <span class="audio-player-label">Hør et eksempel</span>
+          <div class="audio-player fade-in" id="assignment-audio-player">
+            <button class="audio-player-btn" aria-label="Spill av">
+              <svg class="audio-player-icon play-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <svg class="audio-player-icon pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+                <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+              </svg>
+            </button>
+            <div class="audio-waveform"></div>
+            <span class="audio-time">0:00</span>
+          </div>
         </div>
       </div>
     </div>
@@ -195,36 +231,71 @@
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-    // Audio player
-    (function() {
-      var audio = new Audio('assets/audio_example.mp3');
-      var playBtn = document.getElementById('audio-play-btn');
-      var iconPlay = document.getElementById('audio-icon-play');
-      var iconPause = document.getElementById('audio-icon-pause');
-      var waveformEl = document.getElementById('audio-waveform');
-      var timeEl = document.getElementById('audio-time');
+    // Audio players — reusable initializer (supports sequential multi-source playback)
+    var allPlayers = [];
+
+    function initAudioPlayer(container, audioSources) {
+      var clips = audioSources.map(function(src) { return new Audio(src); });
+      var durations = [];
+      var totalDuration = 0;
+      var currentIndex = 0;
+      var isPlaying = false;
+
+      var playBtn = container.querySelector('.audio-player-btn');
+      var iconPlay = container.querySelector('.play-icon');
+      var iconPause = container.querySelector('.pause-icon');
+      var waveformEl = container.querySelector('.audio-waveform');
+      var timeEl = container.querySelector('.audio-time');
       var bars = [];
       var barCount = 60;
 
-      // Extract waveform data from the audio file
-      fetch('assets/audio_example.mp3')
-        .then(function(r) { return r.arrayBuffer(); })
-        .then(function(buf) {
-          var ctx = new (window.AudioContext || window.webkitAudioContext)();
-          return ctx.decodeAudioData(buf).then(function(decoded) {
-            ctx.close();
-            return decoded;
+      var player = {
+        pause: function() {
+          clips[currentIndex].pause();
+          isPlaying = false;
+          iconPlay.style.display = 'block';
+          iconPause.style.display = 'none';
+        }
+      };
+      allPlayers.push(player);
+
+      // Fetch and decode all sources, concatenate samples for combined waveform
+      Promise.all(audioSources.map(function(src) {
+        return fetch(src)
+          .then(function(r) { return r.arrayBuffer(); })
+          .then(function(buf) {
+            var ctx = new (window.AudioContext || window.webkitAudioContext)();
+            return ctx.decodeAudioData(buf).then(function(decoded) {
+              ctx.close();
+              return decoded;
+            });
           });
-        })
-        .then(function(decoded) {
-          var data = decoded.getChannelData(0);
-          var segLen = Math.floor(data.length / barCount);
+      }))
+        .then(function(decodedBuffers) {
+          // Store durations
+          decodedBuffers.forEach(function(decoded, i) {
+            durations[i] = decoded.duration;
+          });
+          totalDuration = durations.reduce(function(a, b) { return a + b; }, 0);
+
+          // Concatenate channel data from all clips
+          var totalLength = decodedBuffers.reduce(function(sum, d) { return sum + d.getChannelData(0).length; }, 0);
+          var combined = new Float32Array(totalLength);
+          var offset = 0;
+          decodedBuffers.forEach(function(decoded) {
+            var data = decoded.getChannelData(0);
+            combined.set(data, offset);
+            offset += data.length;
+          });
+
+          // Compute waveform bars from combined data
+          var segLen = Math.floor(combined.length / barCount);
           var amps = [];
           for (var i = 0; i < barCount; i++) {
             var sum = 0;
             var start = i * segLen;
             for (var j = start; j < start + segLen; j++) {
-              sum += data[j] * data[j];
+              sum += combined[j] * combined[j];
             }
             amps.push(Math.sqrt(sum / segLen));
           }
@@ -238,6 +309,13 @@
           var fallback = [];
           for (var i = 0; i < barCount; i++) fallback.push(0.2 + Math.random() * 0.8);
           renderWaveform(fallback);
+          // Fallback durations from metadata
+          clips.forEach(function(clip, i) {
+            clip.addEventListener('loadedmetadata', function() {
+              durations[i] = clip.duration;
+              totalDuration = durations.reduce(function(a, b) { return a + b; }, 0);
+            });
+          });
         });
 
       function renderWaveform(amplitudes) {
@@ -280,42 +358,108 @@
         return m + ':' + (sec < 10 ? '0' : '') + sec;
       }
 
+      function getElapsed() {
+        var elapsed = 0;
+        for (var i = 0; i < currentIndex; i++) {
+          elapsed += (durations[i] || 0);
+        }
+        elapsed += clips[currentIndex].currentTime;
+        return elapsed;
+      }
+
+      function resetAll() {
+        isPlaying = false;
+        currentIndex = 0;
+        clips.forEach(function(c) { c.currentTime = 0; });
+        iconPlay.style.display = 'block';
+        iconPause.style.display = 'none';
+        updateBars(0);
+        timeEl.textContent = '0:00';
+      }
+
+      // Wire up timeupdate on every clip
+      clips.forEach(function(clip) {
+        clip.addEventListener('timeupdate', function() {
+          if (totalDuration) {
+            var elapsed = getElapsed();
+            updateBars(elapsed / totalDuration);
+            timeEl.textContent = formatTime(elapsed);
+          }
+        });
+      });
+
+      // Wire up ended on every clip for seamless sequential playback
+      clips.forEach(function(clip, i) {
+        clip.addEventListener('ended', function() {
+          if (i < clips.length - 1) {
+            // Advance to next clip
+            currentIndex = i + 1;
+            clips[currentIndex].currentTime = 0;
+            clips[currentIndex].play();
+          } else {
+            // Last clip ended — reset everything
+            resetAll();
+          }
+        });
+      });
+
       playBtn.addEventListener('click', function() {
-        if (audio.paused) {
-          audio.play();
+        if (!isPlaying) {
+          // Pause any other playing player
+          allPlayers.forEach(function(p) {
+            if (p !== player) p.pause();
+          });
+          clips[currentIndex].play();
+          isPlaying = true;
           iconPlay.style.display = 'none';
           iconPause.style.display = 'block';
         } else {
-          audio.pause();
+          clips[currentIndex].pause();
+          isPlaying = false;
           iconPlay.style.display = 'block';
           iconPause.style.display = 'none';
         }
       });
 
-      audio.addEventListener('timeupdate', function() {
-        if (audio.duration) {
-          updateBars(audio.currentTime / audio.duration);
-          timeEl.textContent = formatTime(audio.currentTime);
-        }
-      });
-
-      audio.addEventListener('ended', function() {
-        iconPlay.style.display = 'block';
-        iconPause.style.display = 'none';
-        updateBars(0);
-        timeEl.textContent = '0:00';
-        audio.currentTime = 0;
-      });
-
+      // Seeking across clip boundaries
       waveformEl.addEventListener('click', function(e) {
         var rect = waveformEl.getBoundingClientRect();
         var frac = (e.clientX - rect.left) / rect.width;
-        if (audio.duration) {
-          audio.currentTime = frac * audio.duration;
-          updateBars(frac);
+        if (!totalDuration) return;
+
+        var targetTime = frac * totalDuration;
+        var wasPlaying = isPlaying;
+
+        // Pause current clip
+        clips[currentIndex].pause();
+
+        // Find which clip the target time falls in
+        var accumulated = 0;
+        for (var i = 0; i < clips.length; i++) {
+          var clipDur = durations[i] || 0;
+          if (targetTime <= accumulated + clipDur) {
+            currentIndex = i;
+            clips[i].currentTime = targetTime - accumulated;
+            break;
+          }
+          accumulated += clipDur;
+        }
+
+        // Reset clips after the target so they start from 0 if reached later
+        for (var j = currentIndex + 1; j < clips.length; j++) {
+          clips[j].currentTime = 0;
+        }
+
+        updateBars(frac);
+
+        if (wasPlaying) {
+          clips[currentIndex].play();
         }
       });
-    })();
+    }
+
+    initAudioPlayer(document.getElementById('audio-player'), ['assets/audio_example.mp3']);
+    initAudioPlayer(document.getElementById('assignment-audio-player'), ['assets/assignment1.mp3', 'assets/assignment1-hint.mp3']);
 
     // Contact email (assembled at runtime to deter scraping)
     (function(){

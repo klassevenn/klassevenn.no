@@ -341,6 +341,37 @@ img {
   flex-shrink: 0;
 }
 
+/* ===== Assignment Composition ===== */
+.assignment-composition {
+  position: relative;
+  width: 320px;
+  aspect-ratio: 3 / 4;
+  margin: 0 auto;
+}
+
+.assignment-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150%;
+  transform: rotate(-3deg);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  z-index: 1;
+}
+
+.assignment-phone {
+  position: absolute;
+  bottom: 0;
+  right: -40px;
+  z-index: 2;
+}
+
+.assignment-phone img {
+  width: 180px;
+}
+
+
 /* ===== Contact ===== */
 .contact {
   padding: 100px 0 80px;
@@ -600,6 +631,15 @@ img {
   .phone-frame-lg img {
     width: 90vw;
   }
+
+  .assignment-composition {
+    width: 260px;
+  }
+
+  .assignment-phone img {
+    width: 130px;
+  }
+
 
   .audio-player {
     max-width: 300px;
